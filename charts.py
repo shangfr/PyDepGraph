@@ -8,9 +8,10 @@ from streamlit_echarts import st_echarts
 
 def render_graph(graph):
     option = {
+        "backgroundColor": graph['bg_color'],
         "title": {
-            "text": "Packages",
-            "subtext": "Default layout",
+            "text": "",
+            "subtext": "",
             "top": "bottom",
             "left": "right",
         },
@@ -27,10 +28,10 @@ def render_graph(graph):
                 "lineStyle": {"color": graph["links_color"]},
                 "roam": True,
                 #"label": {"position": "right"},
-                "label": {"show": True,"fontSize": graph["nodes_font_size"]},
+                "label": {"show": graph["show_n"],"fontSize": graph["nodes_font_size"]},
                 "edgeSymbol": ["none", "arrow"],
                 "draggable": True,
-                "force": {"repulsion": 100},
+                "force": {"repulsion": graph["repulsion_forces"]},
             }
         ],
     }
