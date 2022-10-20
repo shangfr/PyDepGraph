@@ -1,26 +1,46 @@
 # PyDepGraph
 
 #### 介绍
+
 PyDepGraph-Python项目依赖树可视化工具
 
 PyDepGraph is a utility for displaying the installed python packages in form of a dependency tree. 
 
+![pic](picture/pic1.png)
 
 #### 软件架构
+
 软件架构说明
 
+- **Pipdeptree** Python项目依赖数据获取
+- **Streamlit** Web应用程序框架
+- **Echarts** Graph可视化
 
 #### 安装教程
 
-1.  xxxx
-2.  xxxx
-3.  xxxx
+1. $ git clone https://gitee.com/vencen/py-dep-graph.git
 
 #### 使用说明
 
-1.  xxxx
-2.  xxxx
-3.  xxxx
+1. $ cd py-dep-graph
+2. $ streamlit run app.py
+
+##### 上传本地项目依赖json文件
+
+**查看所有包及其依赖**
+
+1. 安装 $ pip install pipdeptree
+2. 执行 $ pipdeptree --json > pkg.json
+
+**查看指定包，其需要的依赖** 
+
+3. 执行 $ pipdeptree --json -p xxx包名 > xxxpkg.json
+
+**查看哪些其它包，依赖于此指定包**
+
+4. 执行 $ pipdeptree --json -p xxx包名 -r  > xxxpkg.json
+
+
 
 #### 参与贡献
 
@@ -29,12 +49,3 @@ PyDepGraph is a utility for displaying the installed python packages in form of 
 3.  提交代码
 4.  新建 Pull Request
 
-
-#### 特技
-
-1.  使用 Readme\_XXX.md 来支持不同的语言，例如 Readme\_en.md, Readme\_zh.md
-2.  Gitee 官方博客 [blog.gitee.com](https://blog.gitee.com)
-3.  你可以 [https://gitee.com/explore](https://gitee.com/explore) 这个地址来了解 Gitee 上的优秀开源项目
-4.  [GVP](https://gitee.com/gvp) 全称是 Gitee 最有价值开源项目，是综合评定出的优秀开源项目
-5.  Gitee 官方提供的使用手册 [https://gitee.com/help](https://gitee.com/help)
-6.  Gitee 封面人物是一档用来展示 Gitee 会员风采的栏目 [https://gitee.com/gitee-stars/](https://gitee.com/gitee-stars/)
