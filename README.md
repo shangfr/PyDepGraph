@@ -2,6 +2,8 @@
 
 ![Star](https://img.shields.io/github/stars/shangfr/PyDepGraph?style=flat-square) ![fork](https://img.shields.io/github/forks/shangfr/PyDepGraph?style=flat-square) ![watch](https://img.shields.io/github/watchers/shangfr/PyDepGraph?style=flat-square) ![Apache-2.0](https://img.shields.io/github/license/shangfr/PyDepGraph?style=flat-square) [![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://shangfr-pydepgraph-app-gh2ivs.streamlitapp.com/)
 
+**简体中文**🀄 | [English🌎](./README_en.md)
+
 #### 介绍
 
 [PyDepGraph-Python项目依赖树可视化工具](https://shangfr-pydepgraph-app-gh2ivs.streamlitapp.com/)
@@ -20,7 +22,7 @@ PyDepGraph is a utility for displaying the installed python packages in form of 
 
 #### 安装教程
 
-1. $ git clone https://gitee.com/vencen/py-dep-graph.git
+1. $ git clone https://github.com/shangfr/PyDepGraph.git
 
 #### 使用说明
 
@@ -34,11 +36,11 @@ PyDepGraph is a utility for displaying the installed python packages in form of 
 1. 安装 $ pip install pipdeptree
 2. 执行 $ pipdeptree --json > pkg.json
 
-**查看指定包，其需要的依赖** 
+**查看指定包及其需要的依赖** 
 
 3. 执行 $ pipdeptree --json -p xxx包名 > xxxpkg.json
 
-**查看哪些其它包，依赖于此指定包**
+**查看哪些包依赖于此指定包**
 
 4. 执行 $ pipdeptree --json -p xxx包名 -r  > xxxpkg.json
 
