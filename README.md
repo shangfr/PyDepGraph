@@ -2,7 +2,7 @@
 
 ![Star](https://img.shields.io/github/stars/shangfr/PyDepGraph?style=flat-square) ![fork](https://img.shields.io/github/forks/shangfr/PyDepGraph?style=flat-square) ![watch](https://img.shields.io/github/watchers/shangfr/PyDepGraph?style=flat-square) ![Apache-2.0](https://img.shields.io/github/license/shangfr/PyDepGraph?style=flat-square) [![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://shangfr-pydepgraph-app-gh2ivs.streamlitapp.com/)
 
-**简体中文**🀄 | [English🌎](./README_en.md)
+**简体中文**🀄 | [English🌎](./README.en.md)
 
 #### 介绍
 
@@ -11,6 +11,10 @@
 PyDepGraph is a utility for displaying the installed python packages in form of a dependency tree. 
 
 ![pic](./picture/pic0.png)
+
+![pic](./picture/pic1.png)
+![pic](./picture/pic2.png)
+![pic](./picture/pic3.png)
 
 #### 软件架构
 

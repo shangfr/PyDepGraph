@@ -10,6 +10,11 @@ PyDepGraph is a utility for displaying the installed python packages in form of 
 
 ![pic](./picture/pic0.png)
 
+![pic](./picture/pic1.png)
+![pic](./picture/pic2.png)
+![pic](./picture/pic3.png)
+
+
 #### Software Architecture
 
 Software architecture description
