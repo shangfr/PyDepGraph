@@ -10,7 +10,7 @@ from streamlit.logger import get_logger
 from pipdeptree import get_installed_distributions, PackageDAG
 from language import chinese_dict
 from charts import render_graph
-from utils import extract_graph_data
+from utils import extract_graph_data, remove_branches
 
 LOGGER = get_logger(__name__)
 
@@ -20,29 +20,35 @@ st.header('PackagesGraph 👇 ')
 
 lang = st.sidebar.select_slider(
     '💬 Select a Language of The App',
-    options=['English', '中文'])
+    options=['English', '中文'],
+    help='改变语言将触发app初始化')
+
 
 if lang == '中文':
     lang_dict = chinese_dict
 else:
     lang_dict = {k: k for k, v in chinese_dict.items()}
 
+
 with st.sidebar:
 
-    col1, col2 = st.columns(2)
+    col1, col2 = st.columns([1, 2])
+    col15, col16 = st.columns([1, 2])
+    remove = st.checkbox('Remove Branches Nodes')
+
     with st.expander(lang_dict['Color Setting']):
         col3, col5, col6, col7, col8 = st.columns(5)
 
     with st.expander(lang_dict['Nodes Setting']):
-        col15, col16 = st.columns(2)
+
         col9, col10 = st.columns(2)
         col11, col12 = st.columns(2)
         col13, col14 = st.columns(2)
-        
 
     with st.expander(lang_dict['Upload your own Data']):
-        uploaded_file = st.file_uploader(lang_dict['Proceed as follows'], type=['json'])
-        
+        uploaded_file = st.file_uploader(
+            lang_dict['Proceed as follows'], type=['json'])
+
         st.markdown('''
                 ``` bash
                 # shows the local python packages
@@ -54,6 +60,16 @@ with st.sidebar:
                 
                 ```
                 ''')
+
+
+layout = col15.selectbox('Layout', ['force', 'circular'])
+show_opt = col16.multiselect(
+    'Show Pkg',
+    [lang_dict["Installed Ver"], lang_dict["Required Ver"]],
+    [lang_dict["Required Ver"]])
+
+show_n = lang_dict["Installed Ver"] in show_opt
+show_l = lang_dict["Required Ver"] in show_opt
 
 
 bg_color = col3.color_picker(lang_dict['BG'], '#E9F7F0')
@@ -70,9 +86,6 @@ nodes_font_size = col12.slider(lang_dict["Nodes FontSize"], 5, 50, 12)
 label_font_size = col13.slider(lang_dict["Label FontSize"], 5, 50, 10)
 repulsion_forces = col14.slider(lang_dict["Repulsion Forces"], 5, 200, 100)
 
-show_n = col15.checkbox(lang_dict["Show Nodes"],help='show installed version')
-show_l = col16.checkbox(lang_dict["Show Label"],help='show required version')
-
 
 @st.cache(allow_output_mutation=True)
 def read_pkgs(local_only=True, user_only=False):
@@ -85,8 +98,10 @@ if uploaded_file is None:
     local_only = True
     user_only = False
     tree = read_pkgs(local_only, user_only)
-    packages = col1.text_input(lang_dict['Packages'], value='streamlit',help=lang_dict['Comma Separated'])
-    exclude = col2.text_input(lang_dict['Exclude'], value='pandas,numpy',help=lang_dict['Comma Separated'])
+    packages = col1.text_input(
+        lang_dict['Packages'], value='streamlit', help=lang_dict['Comma Separated'])
+    exclude = col2.text_input(
+        lang_dict['Exclude'], value='pandas,numpy', help=lang_dict['Comma Separated'])
 
     show_only = set(packages.split(",")) if packages else None
     exclude = set(exclude.split(",")) if exclude else None
@@ -105,10 +120,13 @@ else:
     bytes_data = uploaded_file.getvalue()
     data = extract_graph_data(bytes_data)
 
-if len(data)==0:
+if remove:
+    data = remove_branches(data, show_only)
+
+if len(data) == 0:
     st.info(lang_dict['Data is Null'])
     st.stop()
-    
+
 item_style = {"normal": {
     "borderColor": border_color,
     "borderWidth": border_width,
@@ -162,10 +180,12 @@ graph["nodes_font_size"] = nodes_font_size
 graph["links_color"] = links_color
 graph['bg_color'] = bg_color
 graph["repulsion_forces"] = repulsion_forces
+graph["layout"] = layout
 
 render_graph(graph)
 
-st.success("**👈 Change graph settings from the sidebar** to design with your own ideas!")
+st.success(
+    "**👈 Change graph settings from the sidebar** to design with your own ideas!")
 
 st.markdown(
     """

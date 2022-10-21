@@ -6,5 +6,8 @@ Created on Thu Oct 20 10:21:50 2022
 """
 
 import json
-with open("data/pkg.json", "rb") as f:
+with open("data/streamlit.json", "rb") as f:
     data = json.loads(f.read())
+
+
+

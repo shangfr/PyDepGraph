@@ -19,8 +19,8 @@ chinese_dict = {
     "Nodes FontSize":'节点字体大小',
     "Label FontSize": '标签字体大小',
     
-    "Show Nodes":'节点名',
-    "Show Label": '标签名',
+    "Installed Ver":'安装版本',
+    "Required Ver": '所需版本',
     
     'Upload your own Data': "上传你的数据",
     'Download Sample Data':"下载样例数据",
