@@ -87,7 +87,7 @@ label_font_size = col13.slider(lang_dict["Label FontSize"], 5, 50, 10)
 repulsion_forces = col14.slider(lang_dict["Repulsion Forces"], 5, 200, 100)
 
 
-@st.cache_resource()
+@st.cache(allow_output_mutation=True)
 def read_pkgs(local_only=True, user_only=False):
     pkgs = get_installed_distributions(local_only, user_only)
     tree = PackageDAG.from_pkgs(pkgs)
