@@ -87,28 +87,62 @@ label_font_size = col13.slider(lang_dict["Label FontSize"], 5, 50, 10)
 repulsion_forces = col14.slider(lang_dict["Repulsion Forces"], 5, 200, 100)
 
 
-@st.cache(allow_output_mutation=True)
+@st.cache_resource
 def read_pkgs(local_only=True, user_only=False):
     pkgs = get_installed_distributions(local_only, user_only)
     tree = PackageDAG.from_pkgs(pkgs)
     return tree
 
 
+@st.cache_resource
+def filter_local(data, include, exclude):
+
+    if include:
+        include = {s.lower() for s in include}
+    if exclude:
+        exclude = {s.lower() for s in exclude}
+    else:
+        exclude = set()
+
+    if include and exclude:
+        assert not (include & exclude)
+
+    data = [c for c in data if c["package"]["key"] not in exclude]
+
+    def find_child(include):
+
+        for node in data:
+            if node["package"]["key"] in include:
+                if node["dependencies"]:
+                    node["dependencies"] = [
+                        c for c in node["dependencies"] if c["key"] not in exclude]
+                    child_lst.append(node)
+                    for dep in node["dependencies"]:
+                        find_child(set([dep["key"]]))
+                else:
+
+                    child_lst.append(node)
+
+    child_lst = []
+    find_child(include)
+    return child_lst
+
+
+packages = col1.text_input(
+    lang_dict['Packages'], value='streamlit', help=lang_dict['Comma Separated'])
+exclude = col2.text_input(
+    lang_dict['Exclude'], value='pandas,numpy', help=lang_dict['Comma Separated'])
+include = set(packages.split(",")) if packages else None
+exclude = set(exclude.split(",")) if exclude else None
+
 if uploaded_file is None:
     local_only = True
     user_only = False
     tree = read_pkgs(local_only, user_only)
-    packages = col1.text_input(
-        lang_dict['Packages'], value='streamlit', help=lang_dict['Comma Separated'])
-    exclude = col2.text_input(
-        lang_dict['Exclude'], value='pandas,numpy', help=lang_dict['Comma Separated'])
 
-    show_only = set(packages.split(",")) if packages else None
-    exclude = set(exclude.split(",")) if exclude else None
-
-    if show_only is not None or exclude is not None:
+    if include is not None or exclude is not None:
         try:
-            tree = tree.filter(show_only, exclude)
+            tree = tree.filter(include, exclude)
         except Exception as e:
             st.error(lang_dict['Pkg Relationship conflict']+str(e))
             st.stop()
@@ -120,8 +154,15 @@ else:
     bytes_data = uploaded_file.getvalue()
     data = extract_graph_data(bytes_data)
 
+    if include is not None or exclude is not None:
+        try:
+            data = filter_local(data, include, exclude)
+        except Exception as e:
+            st.error(lang_dict['Pkg Relationship conflict']+str(e))
+            st.stop()
+
 if remove:
-    data = remove_branches(data, show_only)
+    data = remove_branches(data, include)
 
 if len(data) == 0:
     st.info(lang_dict['Data is Null'])
