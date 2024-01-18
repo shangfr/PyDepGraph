@@ -1,9 +1,12 @@
 # 语言包
 chinese_dict = {
-    'Local Only':'仅限本地Python环境',
-    'User Only':'仅限当前用户',
+    'Local Only':'本地Python环境',
+    'User Only':'当前用户环境',
+    'Layout':'布局',
+    'Show Pkg':'显示',
     'Packages':'包名',
-    'Exclude':'不含',
+    'Dependency Exclusions':'不含依赖包',
+    'Remove Branches Nodes':'去除分支节点',
     'Color Setting':'颜色设置',
     'Node':'节点',
     'Border':'边框',
@@ -19,8 +22,8 @@ chinese_dict = {
     "Nodes FontSize":'节点字体大小',
     "Label FontSize": '标签字体大小',
     
-    "Installed Ver":'安装版本',
-    "Required Ver": '所需版本',
+    "Show Installed Version":'安装版本',
+    "Show Required Version": '所需版本',
     
     'Upload your own Data': "上传你的数据",
     'Download Sample Data':"下载样例数据",

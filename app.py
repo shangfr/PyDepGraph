@@ -7,7 +7,7 @@ Created on Wed Oct 19 14:34:26 2022
 
 import streamlit as st
 from streamlit.logger import get_logger
-from pipdeptree import get_installed_distributions, PackageDAG
+
 from language import chinese_dict
 from charts import render_graph
 from utils import extract_graph_data, remove_branches
@@ -30,12 +30,17 @@ else:
     lang_dict = {k: k for k, v in chinese_dict.items()}
 
 
+col1, col2 = st.columns([1, 2])
+
 with st.sidebar:
 
-    col1, col2 = st.columns([1, 2])
-    col15, col16 = st.columns([1, 2])
-    remove = st.checkbox('Remove Branches Nodes')
+    layout = st.selectbox(lang_dict['Layout'], ['force', 'circular'])
 
+    show_n = st.checkbox(lang_dict["Show Installed Version"],value=True)
+    show_l = st.checkbox(lang_dict["Show Required Version"],value=True)
+    remove = st.checkbox(lang_dict['Remove Branches Nodes'])
+
+    
     with st.expander(lang_dict['Color Setting']):
         col3, col5, col6, col7, col8 = st.columns(5)
 
@@ -45,7 +50,7 @@ with st.sidebar:
         col11, col12 = st.columns(2)
         col13, col14 = st.columns(2)
 
-    with st.expander(lang_dict['Upload your own Data']):
+    with st.expander(lang_dict['Upload your own Data'], expanded=True):
         uploaded_file = st.file_uploader(
             lang_dict['Proceed as follows'], type=['json'])
 
@@ -62,14 +67,6 @@ with st.sidebar:
                 ''')
 
 
-layout = col15.selectbox('Layout', ['force', 'circular'])
-show_opt = col16.multiselect(
-    'Show Pkg',
-    [lang_dict["Installed Ver"], lang_dict["Required Ver"]],
-    [lang_dict["Required Ver"]])
-
-show_n = lang_dict["Installed Ver"] in show_opt
-show_l = lang_dict["Required Ver"] in show_opt
 
 
 bg_color = col3.color_picker(lang_dict['BG'], '#E9F7F0')
@@ -88,14 +85,22 @@ repulsion_forces = col14.slider(lang_dict["Repulsion Forces"], 5, 200, 100)
 
 
 @st.cache_resource
-def read_pkgs(local_only=True, user_only=False):
-    pkgs = get_installed_distributions(local_only, user_only)
+def read_pkgs():
+    from pip._internal.metadata import pkg_resources
+    from pipdeptree._models import PackageDAG
+    
+    dists = pkg_resources.Environment.from_paths(None).iter_installed_distributions(
+        local_only=True,
+        skip=(),
+        user_only=False,
+    )
+    pkgs = [d._dist for d in dists] 
     tree = PackageDAG.from_pkgs(pkgs)
     return tree
 
 
 @st.cache_resource
-def filter_local(data, include, exclude):
+def filter_local(data, include, exclude=[]):
 
     if include:
         include = {s.lower() for s in include}
@@ -128,39 +133,37 @@ def filter_local(data, include, exclude):
     return child_lst
 
 
-packages = col1.text_input(
-    lang_dict['Packages'], value='streamlit', help=lang_dict['Comma Separated'])
-exclude = col2.text_input(
-    lang_dict['Exclude'], value='pandas,numpy', help=lang_dict['Comma Separated'])
-include = set(packages.split(",")) if packages else None
-exclude = set(exclude.split(",")) if exclude else None
-
 if uploaded_file is None:
-    local_only = True
-    user_only = False
-    tree = read_pkgs(local_only, user_only)
-
-    if include is not None or exclude is not None:
-        try:
-            tree = tree.filter(include, exclude)
-        except Exception as e:
-            st.error(lang_dict['Pkg Relationship conflict']+str(e))
-            st.stop()
-
+    tree = read_pkgs()
     data = [{"package": k.as_dict(), "dependencies": [v.as_dict() for v in vs]}
             for k, vs in tree.items()]
-
 else:
     bytes_data = uploaded_file.getvalue()
     data = extract_graph_data(bytes_data)
 
-    if include is not None or exclude is not None:
-        try:
-            data = filter_local(data, include, exclude)
-        except Exception as e:
-            st.error(lang_dict['Pkg Relationship conflict']+str(e))
-            st.stop()
+pkgs_name = [n['package']['key'] for n in data]
 
+include = col1.selectbox(
+    lang_dict['Packages'], options=pkgs_name)
+include = [include]
+
+data_dependencies = remove_branches(data, include)[0]['dependencies']
+pkgs_name_dependencies = [n['key'] for n in data_dependencies]
+
+exclude = col2.multiselect(
+    lang_dict['Dependency Exclusions'], options=pkgs_name_dependencies)
+
+
+#data_f = filter_local(data, include)
+
+
+if include is not None or exclude is not None:
+    try:
+        data = filter_local(data, include, exclude)
+    except Exception as e:
+        st.error(lang_dict['Pkg Relationship conflict']+str(e))
+        st.stop()
+        
 if remove:
     data = remove_branches(data, include)
 
@@ -224,6 +227,8 @@ graph["repulsion_forces"] = repulsion_forces
 graph["layout"] = layout
 
 render_graph(graph)
+
+st.json({"Packages":data})
 
 st.success(
     "**👈 Change graph settings from the sidebar** to design with your own ideas!")
