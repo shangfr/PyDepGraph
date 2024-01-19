@@ -4,24 +4,41 @@ Created on Wed Oct 19 14:34:26 2022
 
 @author: shangfr
 """
-
 import streamlit as st
 from streamlit.logger import get_logger
+from pipdeptree._render import render_json_tree
 
 from language import chinese_dict
-from charts import render_graph
-from utils import extract_graph_data, remove_branches
+from charts import render_graph, render_tree
+from utils import extract_graph_data, process_data_for_visualization
 
 LOGGER = get_logger(__name__)
 
 st.set_page_config(page_title='PyDepGraph', page_icon='🌐', layout="wide")
 st.sidebar.title('🌐 PyDepGraph')
-st.header('PackagesGraph 👇 ')
+st.header("Find the dependencies of a Python package")
+st.caption("PyDepGraph is a web application designed to display information about Python installed packages and their dependencies. 👇 ")
+
+st.write('''
+<style>
+button {
+    height: auto;
+    padding-top: 10px !important;
+    padding-bottom: 10px !important;
+}
+
+[data-testid="column"] {
+    width: calc(20% - 1rem) !important;
+    flex: 1 1 calc(20% - 1rem) !important;
+    min-width: calc(20% - 1rem) !important;
+}
+</style>''', unsafe_allow_html=True)
+
 
 lang = st.sidebar.select_slider(
     '💬 Select a Language of The App',
     options=['English', '中文'],
-    help='改变语言将触发app初始化')
+    help='A useful tool for visualizing Python package dependencies.')
 
 
 if lang == '中文':
@@ -30,17 +47,10 @@ else:
     lang_dict = {k: k for k, v in chinese_dict.items()}
 
 
-col1, col2 = st.columns([1, 2])
+col01, col02, col03 = st.columns(3)
 
 with st.sidebar:
 
-    layout = st.selectbox(lang_dict['Layout'], ['force', 'circular'])
-
-    show_n = st.checkbox(lang_dict["Show Installed Version"],value=True)
-    show_l = st.checkbox(lang_dict["Show Required Version"],value=True)
-    remove = st.checkbox(lang_dict['Remove Branches Nodes'])
-
-    
     with st.expander(lang_dict['Color Setting']):
         col3, col5, col6, col7, col8 = st.columns(5)
 
@@ -58,15 +68,13 @@ with st.sidebar:
                 ``` bash
                 # shows the local python packages
                 pip install pipdeptree
-                pipdeptree --json > pkg.json
+                pipdeptree --json-tree > pkg.json
                 
                 # shows a particular package
-                pipdeptree --json -p xxxpkg > xxxpkg.json
+                pipdeptree --json-tree -p xxxpkg > xxxpkg.json
                 
                 ```
                 ''')
-
-
 
 
 bg_color = col3.color_picker(lang_dict['BG'], '#E9F7F0')
@@ -86,91 +94,60 @@ repulsion_forces = col14.slider(lang_dict["Repulsion Forces"], 5, 200, 100)
 
 @st.cache_resource
 def read_pkgs():
-    from pip._internal.metadata import pkg_resources
+    from pipdeptree._discovery import get_installed_distributions
     from pipdeptree._models import PackageDAG
-    
-    dists = pkg_resources.Environment.from_paths(None).iter_installed_distributions(
-        local_only=True,
-        skip=(),
-        user_only=False,
-    )
-    pkgs = [d._dist for d in dists] 
+
+    pkgs = get_installed_distributions(local_only=True, user_only=False)
     tree = PackageDAG.from_pkgs(pkgs)
+
     return tree
-
-
-@st.cache_resource
-def filter_local(data, include, exclude=[]):
-
-    if include:
-        include = {s.lower() for s in include}
-    if exclude:
-        exclude = {s.lower() for s in exclude}
-    else:
-        exclude = set()
-
-    if include and exclude:
-        assert not (include & exclude)
-
-    data = [c for c in data if c["package"]["key"] not in exclude]
-
-    def find_child(include):
-
-        for node in data:
-            if node["package"]["key"] in include:
-                if node["dependencies"]:
-                    node["dependencies"] = [
-                        c for c in node["dependencies"] if c["key"] not in exclude]
-                    child_lst.append(node)
-                    for dep in node["dependencies"]:
-                        find_child(set([dep["key"]]))
-                else:
-
-                    child_lst.append(node)
-
-    child_lst = []
-    find_child(include)
-    return child_lst
 
 
 if uploaded_file is None:
     tree = read_pkgs()
-    data = [{"package": k.as_dict(), "dependencies": [v.as_dict() for v in vs]}
-            for k, vs in tree.items()]
+    pkgs = [{"package": k.as_dict(), "dependencies": [v.as_dict()
+                                                      for v in vs]} for k, vs in tree.items()]
+
 else:
-    bytes_data = uploaded_file.getvalue()
-    data = extract_graph_data(bytes_data)
+    data_json = uploaded_file.getvalue()
+    pkgs = extract_graph_data(data_json)
 
-pkgs_name = [n['package']['key'] for n in data]
 
-include = col1.selectbox(lang_dict['Packages'], options=pkgs_name, index=pkgs_name.index("streamlit"))
+if len(pkgs) == 0:
+    st.info(lang_dict['Data is Null'])
+    st.stop()
+
+pkgs_name = [p['package']['key'] if p.get(
+    'package') else p['key'] for p in pkgs]
+
+if "streamlit" in pkgs_name:
+    ids = pkgs_name.index("streamlit")
+else:
+    ids = None
+
+include = col01.selectbox(lang_dict['Package'], options=pkgs_name, index=ids)
+if include is None:
+    st.stop()
+
 include = [include]
 
-data_dependencies = remove_branches(data, include)[0]['dependencies']
-pkgs_name_dependencies = [n['key'] for n in data_dependencies]
+pkgs_name_dependencies = [[cp['key'] for cp in p['dependencies']]
+                          for p in pkgs if p['package']['key'] in include]
 
-exclude = col2.multiselect(
-    lang_dict['Dependency Exclusions'], options=pkgs_name_dependencies)
-
-
-#data_f = filter_local(data, include)
+exclude = col02.multiselect(
+    lang_dict['Dependency Exclusions'], options=pkgs_name_dependencies[0])
 
 
 if include is not None or exclude is not None:
     try:
-        data = filter_local(data, include, exclude)
+        pkgs_tree = tree.filter_nodes(include, exclude)
     except Exception as e:
-        st.error(lang_dict['Pkg Relationship conflict']+str(e))
+        st.error(lang_dict['Pkg filter_nodes error']+str(e))
         st.stop()
-        
-if remove:
-    data = remove_branches(data, include)
+#data_f = filter_local(data, include)
 
-if len(data) == 0:
-    st.info(lang_dict['Data is Null'])
-    st.stop()
 
-item_style = {"normal": {
+node_style = {"normal": {
     "borderColor": border_color,
     "borderWidth": border_width,
     "shadowBlur": shadow_blur,
@@ -178,56 +155,43 @@ item_style = {"normal": {
     "color": node_color
 }}
 
-nodes = []
-links = []
-categories = []
+
+layout = col03.selectbox(lang_dict['Layout'], [
+                         'force', 'circular', 'tree', 'radial'])
+
+show_n = col01.checkbox(lang_dict["Show Installed Version"], value=True)
+show_l = col02.checkbox(lang_dict["Show Required Version"], value=True)
+remove = col03.checkbox(lang_dict['Remove Branches Nodes'])
+
+link_style = {"show": show_l, "fontSize": label_font_size, "remove": remove}
+
+data_json = render_json_tree(pkgs_tree)
+data = extract_graph_data(data_json)
+result = process_data_for_visualization(data, node_style, link_style)
+# print(result)
+
+if layout in ['tree', 'radial']:
+    graph = {"data": result['data'], "layout": layout}
+    render_tree(graph)
+else:
+
+    graph = {"nodes": result['nodes'],
+             "links": result['links'], "categories": []}
+
+    for idx, _ in enumerate(graph["nodes"]):
+        graph["nodes"][idx]["symbolSize"] = node_size
+
+    graph["show_n"] = show_n
+    graph["nodes_font_size"] = nodes_font_size
+    graph["links_color"] = links_color
+    graph['bg_color'] = bg_color
+    graph["repulsion_forces"] = repulsion_forces
+    graph["layout"] = layout
+
+    render_graph(graph)
 
 
-def node_check(node_d, item_style=item_style):
-    node_n = node_d['key']
-    nn = [n for n in nodes if n.get('name') == node_n]
-    if len(nn) == 0:
-        node = {}
-        node_id = str(len(nodes))
-        node['id'] = node_id
-        node['name'] = node_d['key']
-        node['value'] = node_d['installed_version']
-        node['itemStyle'] = item_style
-        nodes.append(node)
-    else:
-        node_id = nn[0]['id']
-    return node_id
-
-
-for d in data:
-    node_id_s = node_check(d['package'])
-    if d['dependencies']:
-        for dd in d['dependencies']:
-            node_id_t = node_check(dd, item_style)
-            link = {}
-            link["source"] = node_id_s
-            link["target"] = node_id_t
-            link["label"] = {
-                "show": show_l, "formatter": dd['required_version'], "fontSize": label_font_size}
-            links.append(link)
-
-
-graph = {"nodes": nodes, "links": links, "categories": categories}
-
-
-for idx, _ in enumerate(graph["nodes"]):
-    graph["nodes"][idx]["symbolSize"] = node_size
-
-graph["show_n"] = show_n
-graph["nodes_font_size"] = nodes_font_size
-graph["links_color"] = links_color
-graph['bg_color'] = bg_color
-graph["repulsion_forces"] = repulsion_forces
-graph["layout"] = layout
-
-render_graph(graph)
-
-#st.json({"Packages":data})
+# st.json({"Packages":data})
 
 st.success(
     "**👈 Change graph settings from the sidebar** to design with your own ideas!")

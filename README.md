@@ -25,30 +25,32 @@ PyDepGraph is a utility for displaying the installed python packages in form of 
 - **Echarts** Graph可视化
 
 #### 安装教程
-
-1. $ git clone https://github.com/shangfr/PyDepGraph.git
-
+```bash
+$ git clone https://github.com/shangfr/PyDepGraph.git
+```
 #### 使用说明
-
-1. $ cd py-dep-graph
-2. $ streamlit run app.py
+```bash
+$ cd py-dep-graph
+$ streamlit run app.py
+```
 
 ##### 上传本地项目依赖json文件
 
 **查看所有包及其依赖**
-
-1. 安装 $ pip install pipdeptree
-2. 执行 $ pipdeptree --json > pkg.json
+```bash
+$ pip install pipdeptree
+$ pipdeptree --json > pkg.json
+```
 
 **查看指定包及其需要的依赖** 
-
-3. 执行 $ pipdeptree --json -p xxx包名 > xxxpkg.json
+```bash
+$ pipdeptree --json -p xxx包名 > xxxpkg.json
+```
 
 **查看哪些包依赖于此指定包**
-
-4. 执行 $ pipdeptree --json -p xxx包名 -r  > xxxpkg.json
-
-
+```bash
+$ pipdeptree --json -p xxx包名 -r  > xxxpkg.json
+```
 
 #### 参与贡献
 

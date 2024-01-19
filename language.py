@@ -4,7 +4,7 @@ chinese_dict = {
     'User Only':'当前用户环境',
     'Layout':'布局',
     'Show Pkg':'显示',
-    'Packages':'包名',
+    'Package':'包名',
     'Dependency Exclusions':'不含依赖包',
     'Remove Branches Nodes':'去除分支节点',
     'Color Setting':'颜色设置',

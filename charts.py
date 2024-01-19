@@ -50,4 +50,42 @@ def render_graph(graph):
             }
         ],
     }
-    st_echarts(option, height="500px")
+    st_echarts(option, height="600px")
+
+def render_tree(graph):
+    data = graph["data"]
+    #rename_key_recursive(data[0])
+    
+    option = {
+        "tooltip": {"trigger": "item", "triggerOn": "mousemove"},
+        "series": [
+            {
+                "type": "tree",
+                "data": data,
+                "top": "1%",
+                "left": "7%",
+                "bottom": "1%",
+                "right": "20%",
+                "symbolSize": 7,
+                "layout": graph["layout"],
+                "label": {
+                    "position": "left",
+                    "verticalAlign": "middle",
+                    "align": "right",
+                    "fontSize": 9,
+                },
+                "leaves": {
+                    "label": {
+                        "position": "right",
+                        "verticalAlign": "middle",
+                        "align": "left",
+                    }
+                },
+                "emphasis": {"focus": "descendant"},
+                "expandAndCollapse": True,
+                "animationDuration": 550,
+                "animationDurationUpdate": 750,
+            }
+        ],
+    }
+    st_echarts(option, height="600px")

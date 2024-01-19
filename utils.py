@@ -4,27 +4,84 @@ Created on Thu Oct 20 10:22:45 2022
 
 @author: shangfr
 """
-
 import json
-import streamlit as st
-import inspect
-import textwrap
-
 
 def extract_graph_data(bytes_data):
     data = json.loads(bytes_data)
     return data
 
-def remove_branches(data, pkg):
-    if pkg is None:
-        return data
-    return [n for n in data if n['package'].get('key') in pkg]
+def process_data_for_visualization(data, item_style, link_style):
 
-def show_code(demo):
-    """Showing the code of the demo."""
-    show_code = st.sidebar.checkbox("Show code", False)
-    if show_code:
-        # Showing the code of the demo.
-        st.markdown("## Code")
-        sourcelines, _ = inspect.getsourcelines(demo)
-        st.code(textwrap.dedent("".join(sourcelines[1:])))
+    node = data[0]
+    nodes = [{"name": node['key'],
+              "value":node['installed_version'], "item_style":item_style}]
+    links = []
+
+    def rename_key_recursive(node):
+        nonlocal nodes, links
+
+        old_key = "dependencies"
+        new_key = "children"
+
+        if old_key in node:
+            node['value'] = len(node[old_key])
+            node[new_key] = node.pop(old_key)
+            node['name'] = node.pop('package_name')
+
+            for child_node in node[new_key]:
+                child_name = child_node['key']
+                child_value = child_node['installed_version']
+
+                if {'name': child_name, 'value': child_value, 'itemStyle': item_style} not in nodes:
+                    nodes.append(
+                        {'name': child_name, 'value': child_value, 'itemStyle': item_style})
+
+                link = {"source": node['key'], "target": child_name, "label": {
+                    "show": link_style["show"], "formatter": child_node['required_version'], "fontSize": link_style["fontSize"]}}
+                links.append(link)
+
+                if link_style["remove"]:
+                    child_node['children'] = []
+                    child_node['name'] = child_node.pop('package_name')
+                else:
+                    rename_key_recursive(child_node)
+
+        else:
+            node[new_key] = node.pop(old_key)
+            node['name'] = node.pop('package_name')
+
+    # Start processing with the root node (data[0])
+    rename_key_recursive(node)
+
+    return {'data': data, 'nodes': nodes, 'links': links}
+
+
+
+def prune_dict_by_level(input_dict, target_level):
+    """
+    Recursively prune a dictionary up to a certain level.
+    
+    Parameters:
+    - input_dict: The input dictionary to be pruned.
+    - target_level: The target level up to which the dictionary should be pruned.
+    
+    Returns:
+    - The pruned dictionary.
+    """
+    if target_level == 0:
+        return {}  # If target level is 0, return an empty dictionary
+    
+    pruned_dict = {}
+    
+    for key, value in input_dict.items():
+        if isinstance(value, dict):
+            # Recursively prune nested dictionaries
+            pruned_value = prune_dict_by_level(value, target_level - 1)
+            
+            if pruned_value:  # Only include non-empty dictionaries
+                pruned_dict[key] = pruned_value
+        else:
+            pruned_dict[key] = value
+    
+    return pruned_dict
+
