@@ -143,8 +143,7 @@ else:
 
 pkgs_name = [n['package']['key'] for n in data]
 
-include = col1.selectbox(
-    lang_dict['Packages'], options=pkgs_name)
+include = col1.selectbox(lang_dict['Packages'], options=pkgs_name, index=pkgs_name.index("streamlit"))
 include = [include]
 
 data_dependencies = remove_branches(data, include)[0]['dependencies']
@@ -228,7 +227,7 @@ graph["layout"] = layout
 
 render_graph(graph)
 
-st.json({"Packages":data})
+#st.json({"Packages":data})
 
 st.success(
     "**👈 Change graph settings from the sidebar** to design with your own ideas!")
