@@ -88,4 +88,4 @@ def render_tree(graph):
             }
         ],
     }
-    st_echarts(option, height="600px")
+    st_echarts(option, height="800px")

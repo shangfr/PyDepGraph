@@ -105,42 +105,47 @@ def read_pkgs():
 
 if uploaded_file is None:
     tree = read_pkgs()
-    pkgs = [{"package": k.as_dict(), "dependencies": [v.as_dict()
-                                                      for v in vs]} for k, vs in tree.items()]
-
+    pkgs_name_dependencies = [{"package": k.key, "dependencies": [v.key for v in vs]} for k, vs in tree.items()]
+    
 else:
     data_json = uploaded_file.getvalue()
-    pkgs = extract_graph_data(data_json)
+    tree= extract_graph_data(data_json)
+    pkgs_name_dependencies = [{"package": p["key"], "dependencies": [v["key"] for v in p["dependencies"]]} for p in tree]
 
+pkgs_name = [p['package'] for p in pkgs_name_dependencies]
 
-if len(pkgs) == 0:
+if len(pkgs_name) == 0:
     st.info(lang_dict['Data is Null'])
     st.stop()
-
-pkgs_name = [p['package']['key'] if p.get(
-    'package') else p['key'] for p in pkgs]
-
+    
 if "streamlit" in pkgs_name:
     ids = pkgs_name.index("streamlit")
 else:
     ids = None
-
+    
 include = col01.selectbox(lang_dict['Package'], options=pkgs_name, index=ids)
 if include is None:
     st.stop()
 
 include = [include]
 
-pkgs_name_dependencies = [[cp['key'] for cp in p['dependencies']]
-                          for p in pkgs if p['package']['key'] in include]
+
+pkgs_dependencies = [p['dependencies'] for p in pkgs_name_dependencies if p['package'] in include][0]
 
 exclude = col02.multiselect(
-    lang_dict['Dependency Exclusions'], options=pkgs_name_dependencies[0])
+    lang_dict['Dependency Exclusions'], options=pkgs_dependencies)
 
 
 if include is not None or exclude is not None:
     try:
-        pkgs_tree = tree.filter_nodes(include, exclude)
+        if type(tree[0]) != dict:
+            pkgs_tree = tree.filter_nodes(include, exclude)
+            data_json = render_json_tree(pkgs_tree)
+            data = extract_graph_data(data_json)
+        else:
+            data = [p for p in tree if p['key'] in include]
+            data[0]['dependencies'] = [p for p in data[0]['dependencies'] if p['key'] not in exclude]
+            
     except Exception as e:
         st.error(lang_dict['Pkg filter_nodes error']+str(e))
         st.stop()
@@ -165,8 +170,6 @@ remove = col03.checkbox(lang_dict['Remove Branches Nodes'])
 
 link_style = {"show": show_l, "fontSize": label_font_size, "remove": remove}
 
-data_json = render_json_tree(pkgs_tree)
-data = extract_graph_data(data_json)
 result = process_data_for_visualization(data, node_style, link_style)
 # print(result)
 
@@ -175,18 +178,21 @@ if layout in ['tree', 'radial']:
     render_tree(graph)
 else:
 
-    graph = {"nodes": result['nodes'],
-             "links": result['links'], "categories": []}
+    for idx, _ in enumerate(result['nodes']):
+        result['nodes'][idx]["symbolSize"] = node_size
 
-    for idx, _ in enumerate(graph["nodes"]):
-        graph["nodes"][idx]["symbolSize"] = node_size
+    graph = {"nodes": result['nodes'],
+             "links": result['links'], 
+             "categories": [],
+             "layout": layout}
 
     graph["show_n"] = show_n
     graph["nodes_font_size"] = nodes_font_size
     graph["links_color"] = links_color
     graph['bg_color'] = bg_color
     graph["repulsion_forces"] = repulsion_forces
-    graph["layout"] = layout
+
+    #print(graph)
 
     render_graph(graph)
 

@@ -12,13 +12,15 @@ def extract_graph_data(bytes_data):
 
 def process_data_for_visualization(data, item_style, link_style):
 
-    node = data[0]
-    nodes = [{"name": node['key'],
-              "value":node['installed_version'], "item_style":item_style}]
+    node_tree = data[0]
+    nodes = [{"name": node_tree['key'],
+              "value":node_tree['installed_version'], "item_style":item_style,'symbolSize':len(node_tree["dependencies"])+1}]
+    
     links = []
-
+    nodes_name = []
+    
     def rename_key_recursive(node):
-        nonlocal nodes, links
+        nonlocal nodes, links,nodes_name
 
         old_key = "dependencies"
         new_key = "children"
@@ -32,10 +34,10 @@ def process_data_for_visualization(data, item_style, link_style):
                 child_name = child_node['key']
                 child_value = child_node['installed_version']
 
-                if {'name': child_name, 'value': child_value, 'itemStyle': item_style} not in nodes:
-                    nodes.append(
-                        {'name': child_name, 'value': child_value, 'itemStyle': item_style})
-
+                if child_name not in nodes_name:
+                    nodes.append({'name': child_name, 'value': child_value, 'itemStyle': item_style,'symbolSize':len(child_node["dependencies"])+1})
+                    nodes_name.append(child_name)
+                
                 link = {"source": node['key'], "target": child_name, "label": {
                     "show": link_style["show"], "formatter": child_node['required_version'], "fontSize": link_style["fontSize"]}}
                 links.append(link)
@@ -51,7 +53,7 @@ def process_data_for_visualization(data, item_style, link_style):
             node['name'] = node.pop('package_name')
 
     # Start processing with the root node (data[0])
-    rename_key_recursive(node)
+    rename_key_recursive(node_tree)
 
     return {'data': data, 'nodes': nodes, 'links': links}
 
