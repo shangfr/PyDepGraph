@@ -16,7 +16,7 @@ LOGGER = get_logger(__name__)
 
 st.set_page_config(page_title='PyDepGraph', page_icon='🌐', layout="wide")
 st.sidebar.title('🌐 PyDepGraph')
-st.header("Find the dependencies of a Python package")
+st.header("PKGS Dependencies Detection")
 st.caption("PyDepGraph is a web application designed to display information about Python installed packages and their dependencies. 👇 ")
 
 st.write('''
@@ -105,32 +105,36 @@ def read_pkgs():
 
 if uploaded_file is None:
     tree = read_pkgs()
-    pkgs_name_dependencies = [{"package": k.key, "dependencies": [v.key for v in vs]} for k, vs in tree.items()]
-    
+    pkgs_name_dependencies = [{"package": k.key, "dependencies": [
+        v.key for v in vs]} for k, vs in tree.items()]
+
 else:
     data_json = uploaded_file.getvalue()
-    tree= extract_graph_data(data_json)
-    pkgs_name_dependencies = [{"package": p["key"], "dependencies": [v["key"] for v in p["dependencies"]]} for p in tree]
+    tree = extract_graph_data(data_json)
+    pkgs_name_dependencies = [{"package": p["key"], "dependencies": [
+        v["key"] for v in p["dependencies"]]} for p in tree]
 
 pkgs_name = [p['package'] for p in pkgs_name_dependencies]
 
 if len(pkgs_name) == 0:
     st.info(lang_dict['Data is Null'])
     st.stop()
-    
+
 if "streamlit" in pkgs_name:
     ids = pkgs_name.index("streamlit")
 else:
     ids = None
-    
+
 include = col01.selectbox(lang_dict['Package'], options=pkgs_name, index=ids)
 if include is None:
     st.stop()
 
 include = [include]
+# include=["streamlit"]
+# exclude=[]
 
-
-pkgs_dependencies = [p['dependencies'] for p in pkgs_name_dependencies if p['package'] in include][0]
+pkgs_dependencies = [p['dependencies']
+                     for p in pkgs_name_dependencies if p['package'] in include][0]
 
 exclude = col02.multiselect(
     lang_dict['Dependency Exclusions'], options=pkgs_dependencies)
@@ -144,8 +148,9 @@ if include is not None or exclude is not None:
             data = extract_graph_data(data_json)
         else:
             data = [p for p in tree if p['key'] in include]
-            data[0]['dependencies'] = [p for p in data[0]['dependencies'] if p['key'] not in exclude]
-            
+            data[0]['dependencies'] = [p for p in data[0]
+                                       ['dependencies'] if p['key'] not in exclude]
+
     except Exception as e:
         st.error(lang_dict['Pkg filter_nodes error']+str(e))
         st.stop()
@@ -160,6 +165,7 @@ node_style = {"normal": {
     "color": node_color
 }}
 
+node_style = {}
 
 layout = col03.selectbox(lang_dict['Layout'], [
                          'force', 'circular', 'tree', 'radial'])
@@ -174,7 +180,7 @@ result = process_data_for_visualization(data, node_style, link_style)
 # print(result)
 
 if layout in ['tree', 'radial']:
-    graph = {"data": result['data'], "layout": layout}
+    graph = {"data": result['data'], "layout": layout, "bg_color": bg_color}
     render_tree(graph)
 else:
 
@@ -182,17 +188,17 @@ else:
         result['nodes'][idx]["symbolSize"] = node_size
 
     graph = {"nodes": result['nodes'],
-             "links": result['links'], 
-             "categories": [],
-             "layout": layout}
+             "links": result['links'],
+             "categories": result['categories'],
+             "layout": layout,
+             "bg_color": bg_color,
+             "show_n": show_n,
+             "nodes_font_size": nodes_font_size,
+             "links_color": links_color,
+             "repulsion_forces": repulsion_forces
+             }
 
-    graph["show_n"] = show_n
-    graph["nodes_font_size"] = nodes_font_size
-    graph["links_color"] = links_color
-    graph['bg_color'] = bg_color
-    graph["repulsion_forces"] = repulsion_forces
-
-    #print(graph)
+    # print(graph)
 
     render_graph(graph)
 

@@ -8,13 +8,40 @@
 
 [PyDepGraph-Python项目依赖树可视化工具](https://shangfr-pydepgraph-app-gh2ivs.streamlitapp.com/)
 
+PyDepGraph is a web application designed to display information about Python installed packages and their dependencies. 👇
+
+<a target="_blank" href="(https://shangfr-pydepgraph-app-gh2ivs.streamlitapp.com/">
+    <img src="./picture/pic.webp" alt="demo"></img>
+</a>
+
 PyDepGraph is a utility for displaying the installed python packages in form of a dependency tree. 
 
-![pic](./picture/pic0.png)
+<table border="0">
+  <tr>
+    <td>
+        <img src="./picture/pic0.png" style="max-height:150px; width:auto; display:block;">
+    </td>
+    <td>
+        <img src="./picture/pic1.png" style="max-height:150px; width:auto; display:block;">
+    </td>
+    <td>
+        <img src="./picture/pic2.png" style="max-height:150px; width:auto; display:block;">
+    </td>
+    <td>
+      <a target="_blank" href="(https://shangfr-pydepgraph-app-gh2ivs.streamlitapp.com/">
+        <img src="./picture/pic3.png" style="max-height:150px; width:auto; display:block;">
+      </a>
+    </td>
+  </tr>
+  <tr>
+    <td>Community Detection</td>
+    <td>Pkgs Tree</td>
+    <td>Node Colors</td>
+    <td>Local File</td>
+  </tr>
+</table>
 
-![pic](./picture/pic1.png)
-![pic](./picture/pic2.png)
-![pic](./picture/pic3.png)
+
 
 #### 软件架构
 
@@ -39,18 +66,14 @@ $ streamlit run app.py
 **查看所有包及其依赖**
 ```bash
 $ pip install pipdeptree
-$ pipdeptree --json > pkg.json
+$ pipdeptree --json-tree > pkg.json
 ```
 
 **查看指定包及其需要的依赖** 
 ```bash
-$ pipdeptree --json -p xxx包名 > xxxpkg.json
+$ pipdeptree --json-tree -p xxx包名 > xxxpkg.json
 ```
 
-**查看哪些包依赖于此指定包**
-```bash
-$ pipdeptree --json -p xxx包名 -r  > xxxpkg.json
-```
 
 #### 参与贡献
 

@@ -6,13 +6,39 @@
 
 [PyDepGraph-Python项目依赖树可视化工具](https://shangfr-pydepgraph-app-gh2ivs.streamlitapp.com/)
 
+
+PyDepGraph is a web application designed to display information about Python installed packages and their dependencies. 👇
+
+<a target="_blank" href="(https://shangfr-pydepgraph-app-gh2ivs.streamlitapp.com/">
+    <img src="./picture/pic.webp" alt="demo"></img>
+</a>
+
 PyDepGraph is a utility for displaying the installed python packages in form of a dependency tree. 
 
-![pic](./picture/pic0.png)
-
-![pic](./picture/pic1.png)
-![pic](./picture/pic2.png)
-![pic](./picture/pic3.png)
+<table border="0">
+  <tr>
+    <td>
+        <img src="./picture/pic0.png" style="max-height:150px; width:auto; display:block;">
+    </td>
+    <td>
+        <img src="./picture/pic1.png" style="max-height:150px; width:auto; display:block;">
+    </td>
+    <td>
+        <img src="./picture/pic2.png" style="max-height:150px; width:auto; display:block;">
+    </td>
+    <td>
+      <a target="_blank" href="(https://shangfr-pydepgraph-app-gh2ivs.streamlitapp.com/">
+        <img src="./picture/pic3.png" style="max-height:150px; width:auto; display:block;">
+      </a>
+    </td>
+  </tr>
+  <tr>
+    <td>Community Detection</td>
+    <td>Pkgs Tree</td>
+    <td>Node Colors</td>
+    <td>Local File</td>
+  </tr>
+</table>
 
 
 #### Software Architecture
@@ -24,28 +50,33 @@ Software architecture description
 - **Echarts** Graph可视化
 
 #### Installation
-
-1. $ git clone https://github.com/shangfr/PyDepGraph.git
+```bash
+$ git clone https://github.com/shangfr/PyDepGraph.git
+```
 
 #### Instructions
-
-1. $ cd py-dep-graph
-2. $ streamlit run app.py
+```bash
+$ cd py-dep-graph
+$ streamlit run app.py
+```
 
 ##### Uploading the Local Dependency Graph
 
 **shows the local python packages**
-
-1. $ pip install pipdeptree
-2. $ pipdeptree --json > pkg.json
+```bash
+$ pip install pipdeptree
+$ pipdeptree --json > pkg.json
+```
 
 **shows a particular package** 
-
-3. $ pipdeptree --json -p xxxpkg > xxxpkg.json
+```bash
+$ pipdeptree --json -p xxxpkg > xxxpkg.json
+```
 
 **shows a particular package is installed**
-
-4. $ pipdeptree --json -p xxxpkg -r  > xxxpkg.json
+```bash
+$ pipdeptree --json -p xxxpkg -r  > xxxpkg.json
+```
 
 #### Contribution
 

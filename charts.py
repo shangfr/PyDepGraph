@@ -57,6 +57,7 @@ def render_tree(graph):
     #rename_key_recursive(data[0])
     
     option = {
+        "backgroundColor": graph['bg_color'],
         "tooltip": {"trigger": "item", "triggerOn": "mousemove"},
         "series": [
             {
