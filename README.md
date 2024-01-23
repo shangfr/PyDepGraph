@@ -10,9 +10,7 @@
 
 PyDepGraph is a web application designed to display information about Python installed packages and their dependencies. 👇
 
-<a target="_blank" href="(https://shangfr-pydepgraph-app-gh2ivs.streamlitapp.com/">
-    <img src="./picture/pic.webp" alt="demo"></img>
-</a>
+<img src="./picture/pic.webp" alt="demo"></img>
 
 PyDepGraph is a utility for displaying the installed python packages in form of a dependency tree. 
 

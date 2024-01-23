@@ -3,3 +3,4 @@
 pipdeptree == 2.13.2
 streamlit == 1.30.0
 streamlit_echarts == 0.4.0
+networkx == 2.8.8
