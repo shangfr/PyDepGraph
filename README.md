@@ -6,6 +6,8 @@
 
 #### 介绍
 
+先使用Pipdeptree获取Python项目依赖数据，然后使用Echarts Graph进行可视化，最后用Streamlit开发了一个线上的Web App。其中，包的分类标签使用了NetworkX内置的社区发现算法Girvan-Newman为依赖项之间的图网络划分社区。
+
 [PyDepGraph-Python项目依赖树可视化工具](https://shangfr-pydepgraph-app-gh2ivs.streamlitapp.com/)
 
 PyDepGraph is a web application designed to display information about Python installed packages and their dependencies. 👇
