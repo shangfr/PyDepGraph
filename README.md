@@ -10,14 +10,16 @@
 
 PyDepGraph is a web application designed to display information about Python installed packages and their dependencies. 👇
 
-<img src="./picture/pic.webp" alt="demo"></img>
+<a target="_blank" href="https://shangfr-pydepgraph-app-gh2ivs.streamlitapp.com/"><img src="./picture/pic.webp" alt="demo"></img></a>
 
 PyDepGraph is a utility for displaying the installed python packages in form of a dependency tree. 
 
 <table border="0">
   <tr>
     <td>
+      <a target="_blank" href="https://shangfr-pydepgraph-app-gh2ivs.streamlitapp.com/">
         <img src="./picture/pic0.png" style="max-height:150px; width:auto; display:block;">
+      </a>
     </td>
     <td>
         <img src="./picture/pic1.png" style="max-height:150px; width:auto; display:block;">
@@ -26,7 +28,7 @@ PyDepGraph is a utility for displaying the installed python packages in form of 
         <img src="./picture/pic2.png" style="max-height:150px; width:auto; display:block;">
     </td>
     <td>
-      <a target="_blank" href="(https://shangfr-pydepgraph-app-gh2ivs.streamlitapp.com/">
+      <a target="_blank" href="https://shangfr-pydepgraph-app-gh2ivs.streamlitapp.com/">
         <img src="./picture/pic3.png" style="max-height:150px; width:auto; display:block;">
       </a>
     </td>
@@ -38,8 +40,6 @@ PyDepGraph is a utility for displaying the installed python packages in form of 
     <td>Local File</td>
   </tr>
 </table>
-online: [![](C:\Users\86155\Desktop\PyDepGraph\share\icons\streamlit-logo.png)](https://shangfr-pydepgraph-app-gh2ivs.streamlitapp.com/)download: [![](share\icons\Graph.32.png)](https://github.com/shangfr/PyDepGraph/releases/download/V1.0.1/PyDepGraph_1.0.1_x64-setup.exe)
-
 
 #### 软件架构
 
@@ -48,6 +48,8 @@ online: [![](C:\Users\86155\Desktop\PyDepGraph\share\icons\streamlit-logo.png)](
 - **Pipdeptree** Python项目依赖数据获取
 - **Streamlit** Web应用程序框架
 - **Echarts** Graph可视化
+
+[online:![](share/icons/streamlit-logo.png)](https://shangfr-pydepgraph-app-gh2ivs.streamlitapp.com/)   [download:![](share/icons/Graph.32.png)](https://github.com/shangfr/PyDepGraph/releases/download/V1.0.1/PyDepGraph_1.0.1_x64-setup.exe)
 
 #### 安装教程
 ```bash
