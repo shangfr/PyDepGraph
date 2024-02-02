@@ -4,11 +4,9 @@
 
 **简体中文**🀄 | [English🌎](./README.en.md)
 
-#### 介绍
+#### 原理介绍
 
-先使用Pipdeptree获取Python项目依赖数据，然后使用Echarts Graph进行可视化，最后用Streamlit开发了一个线上的Web App。其中，包的分类标签使用了NetworkX内置的社区发现算法Girvan-Newman为依赖项之间的图网络划分社区。
-
-[PyDepGraph-Python项目依赖树可视化工具](https://shangfr-pydepgraph-app-gh2ivs.streamlitapp.com/)
+首先，使用Pipdeptree获取Python项目依赖数据，然后使用Echarts Graph进行可视化，最后用Streamlit开发了一个线上的Web App。其中，包的分类标签使用了NetworkX内置的社区发现算法Girvan-Newman为依赖项之间的图网络划分社区。
 
 PyDepGraph is a web application designed to display information about Python installed packages and their dependencies. 👇
 
@@ -40,7 +38,7 @@ PyDepGraph is a utility for displaying the installed python packages in form of 
     <td>Local File</td>
   </tr>
 </table>
-
+online: [![](C:\Users\86155\Desktop\PyDepGraph\share\icons\streamlit-logo.png)](https://shangfr-pydepgraph-app-gh2ivs.streamlitapp.com/)download: [![](share\icons\Graph.32.png)](https://github.com/shangfr/PyDepGraph/releases/download/V1.0.1/PyDepGraph_1.0.1_x64-setup.exe)
 
 
 #### 软件架构
