@@ -57,7 +57,8 @@ $ git clone https://github.com/shangfr/PyDepGraph.git
 ```
 #### 使用说明
 ```bash
-$ cd py-dep-graph
+$ cd PyDepGraph
+$ pip install -r requirements.txt
 $ streamlit run app.py
 ```
 
