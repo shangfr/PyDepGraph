@@ -214,7 +214,7 @@ st.markdown(
     
     ### Want to learn more?
     - Check out 🔎[Streamlit.io](https://streamlit.io)  🔎[Pipdeptree](https://github.com/tox-dev/pipdeptree)  🔎[Echarts](https://echarts.apache.org/)
-    - Jump into my [github](https://gitee.com/vencen/py-dep-graph)
+    - Jump into my [github](https://github.com/shangfr/PyDepGraph)
     - Contact me <shangfr@foxmail.com>
 """
 )
